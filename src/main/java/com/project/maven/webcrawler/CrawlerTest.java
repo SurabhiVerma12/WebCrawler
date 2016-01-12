@@ -17,7 +17,7 @@ public class CrawlerTest
     public static void main( String[] args )
     {
 		Crawler crawler = new Crawler();
-		crawler.search("http://mail-archives.apache.org/mod_mbox/maven-users/");
+		crawler.search("http://mail-archives.apache.org/mod_mbox/maven-users/","2014");
         
        
     }
