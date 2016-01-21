@@ -1,8 +1,7 @@
 package com.project.maven.webcrawler;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -11,7 +10,7 @@ public class Crawler {
 	private static final Logger LOGGER = Logger.getLogger(Crawler.class);
 
 	private Set<String> pagesVisited = new HashSet<String>();
-	private List<String> pagesToVisit = new LinkedList<String>();
+	private Set<String> pagesToVisit = new HashSet<String>();
 
 	public void search(String url, String keyword) {
 		do {
@@ -44,11 +43,14 @@ public class Crawler {
 
 	private String nextUrl() {
 		String nextUrl = null;
-		do {
-			
-			nextUrl = this.pagesToVisit.remove(0);
-			
-		} while (this.pagesVisited.contains(nextUrl) && !this.pagesToVisit.isEmpty());
-		this.pagesVisited.add(nextUrl);
+		
+		Iterator<String> it = this.pagesToVisit.iterator();
+	    do 
+	    {
+	    	nextUrl=it.next().toString();
+	    	it.remove();
+	    }while(this.pagesVisited.contains(nextUrl) );
+	    
+	    this.pagesVisited.add(nextUrl);
 		return nextUrl;
 	}}

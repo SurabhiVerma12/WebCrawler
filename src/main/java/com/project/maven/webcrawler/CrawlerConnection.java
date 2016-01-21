@@ -25,8 +25,8 @@ public class CrawlerConnection {
 
 
 			for (Element link : linksOnPage) {
-				if (link.absUrl("href")
-						.contains("mail-archives.apache.org/mod_mbox/maven-users/"+keyword))
+				if (link.absUrl("href").toLowerCase()
+						.contains("mail-archives.apache.org/mod_mbox/maven-users/"+keyword.toLowerCase()))
 					links.add(link.absUrl("href"));
 				LOGGER.debug("Found : " + link.absUrl("href"));
 			}
@@ -48,7 +48,7 @@ public class CrawlerConnection {
 			Pattern pattern = Pattern.compile(dateYear);
 			Matcher matcher = pattern.matcher(htmlString);
 			if (matcher.find()) {
-				LOGGER.debug( htmlString);
+				
 				result = true;
 			}else{
 				result = false;
