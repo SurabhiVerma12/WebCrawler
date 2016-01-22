@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 import org.apache.log4j.Logger;
 
@@ -20,12 +20,8 @@ public class DownloadMailThread implements Runnable {
 	int size = 1024;
 	String year=null;
 	BlockingQueue<String> downloadURLQueue = null;
-	volatile static boolean finishedcrawler = false;
-
 	
-	public static void setFinishedcrawler(boolean val) {
-		finishedcrawler = val;
-	}
+	
 
 	private static final Logger LOGGER = Logger.getLogger(DownloadMailThread.class);
 	
@@ -74,7 +70,7 @@ public class DownloadMailThread implements Runnable {
 
 	public void run() {
 		// TODO Auto-generated method stub
-		while(!DownloadMailThread.finishedcrawler){
+		while(true){
 			String url;
 			try {
 				url = downloadURLQueue.take();

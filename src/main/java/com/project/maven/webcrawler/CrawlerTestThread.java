@@ -16,6 +16,7 @@ public class CrawlerTestThread  {
 	static String year = "2014";
 	static BlockingQueue<String> addUrlsQueue = new LinkedBlockingQueue<String>() ;
 	static BlockingQueue<String> downloadUrlsQueue = new LinkedBlockingQueue<String>();
+	static Set<String> PagesVigited = new HashSet<String>();
 	
 	
 	public static void main(String...args){

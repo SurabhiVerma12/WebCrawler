@@ -1,58 +1,72 @@
 package com.project.maven.webcrawler;
 
+import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class CrawlerQueueThread implements Runnable{
 	
-	BlockingQueue<String> pagesToVisit = new LinkedBlockingQueue<String>() ;
+	BlockingQueue<String> pagesToVisit = null ;
 	String year;
-	BlockingQueue<String> downloadUrlsQueue = new LinkedBlockingQueue<String>();
-	List<String> urls = new LinkedList<String>();
+	BlockingQueue<String> downloadUrlsQueue = null;
+	Set<String> urls = new HashSet<String>();
 	private static final Logger LOGGER = Logger.getLogger(CrawlerQueueThread.class);
+	public Document returnHtmlDoc(String url){
+		
+		Document doc=null;
+		try {
+			doc = Jsoup.connect(url).get();
+		} catch (IOException e) {
+			
+		}
+		return doc;
+		
+	}
+	private static Set<String> pagesVisited =new HashSet<String>();
+
 	
 	public CrawlerQueueThread(BlockingQueue<String> addUrlsQueue,BlockingQueue<String> downloadUrlsQueue,String year){
 		this.pagesToVisit=addUrlsQueue;
 		this.downloadUrlsQueue=downloadUrlsQueue;
 		this.year = year;
+		
 	}
-	private Set<String> pagesVisited = new HashSet<String>();
-
+	
 
 	public void search(String keyword) throws InterruptedException {
-		do {
-			String currentUrl = null;
-			CrawlerConnection crawlConn = new CrawlerConnection();
-			if (this.pagesToVisit.isEmpty()) {
-				Thread.sleep(3000);
+	
+			
+			
 
-			} else {
+			while(!this.pagesToVisit.isEmpty()){
+				String currentUrl = null;
+				CrawlerConnection crawlConn = new CrawlerConnection();
 				currentUrl = this.nextUrl();
+				boolean success = crawlConn.searhMail(returnHtmlDoc(currentUrl),keyword);
+				if (success) {
+					downloadUrlsQueue.put(currentUrl);
+					LOGGER.debug("Download url :"  +currentUrl);
+				}
+				else{
+					urls = crawlConn.crawl(returnHtmlDoc(currentUrl),keyword);
+					
+				    for(String url : urls)
+				    {
+				    	this.pagesToVisit.put(url);
+					
+				}
+			}
 			}
 
-			boolean success = crawlConn.searhMail(currentUrl,keyword);
-			if (success) {
-				downloadUrlsQueue.put(currentUrl);
+			
 
-
-			}
-			else{
-				urls = crawlConn.crawl(currentUrl,keyword);
-				for(int i =0;i<urls.size();i++)
-				this.pagesToVisit.put(urls.get(i));
-			}
-
-
-
-		} while (!this.pagesToVisit.isEmpty());
 		LOGGER.debug("All the mails have been downloaded");
 
 	}
@@ -72,10 +86,9 @@ public class CrawlerQueueThread implements Runnable{
 			}
 			
 			
-		}while(this.pagesVisited.contains(nextUrl) && !(this.pagesToVisit.isEmpty()));
-		LOGGER.debug("while loop completed for next URL");
-
-		this.pagesVisited.add(nextUrl);
+		}while(pagesVisited.contains(nextUrl) && !this.pagesToVisit.isEmpty());
+		
+       pagesVisited.add(nextUrl);
 		return nextUrl;
 	}
 
