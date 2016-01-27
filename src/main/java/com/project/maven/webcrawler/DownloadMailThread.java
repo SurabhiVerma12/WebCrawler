@@ -10,31 +10,27 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.BlockingQueue;
 
-
 import org.apache.log4j.Logger;
 
 public class DownloadMailThread implements Runnable {
 
-
-	static int i=1;
+	static int i = 1;
 	int size = 1024;
-	String year=null;
+	String year = null;
 	BlockingQueue<String> downloadURLQueue = null;
-	
-	
 
 	private static final Logger LOGGER = Logger.getLogger(DownloadMailThread.class);
-	
-	public DownloadMailThread(BlockingQueue<String> downloadURLQueue,String year){
-		this.downloadURLQueue=downloadURLQueue;
-		this.year =year;
+
+	public DownloadMailThread(BlockingQueue<String> downloadURLQueue, String year) {
+		this.downloadURLQueue = downloadURLQueue;
+		this.year = year;
 	}
 
-	public void downloadMail(String url,String destinationFolder,String filename) {
+	public void downloadMail(String url, String destinationFolder, String filename) {
 		OutputStream outStream = null;
 		URLConnection uCon = null;
 		InputStream is = null;
-		String path="C:\\Users\\surabhiv\\Desktop\\Mail"+destinationFolder;
+		String path = "C:\\Users\\surabhiv\\Desktop\\Mail" + destinationFolder;
 		try {
 			File dir = new File(path);
 			dir.mkdirs();
@@ -42,7 +38,7 @@ public class DownloadMailThread implements Runnable {
 			byte[] buf;
 			int byteRead, byteWritten = 0;
 			url1 = new URL(url);
-			outStream = new BufferedOutputStream(new FileOutputStream(dir + "\\" + filename+"-"+i));
+			outStream = new BufferedOutputStream(new FileOutputStream(dir + "\\" + filename + "-" + i));
 			i++;
 			uCon = url1.openConnection();
 			is = uCon.getInputStream();
@@ -53,7 +49,7 @@ public class DownloadMailThread implements Runnable {
 			}
 			LOGGER.debug("Downloaded Successfully.");
 
-			LOGGER.debug("File name:\"" +  filename+"-"+i + "\"\nNo ofbytes :" + byteWritten);
+			LOGGER.debug("File name:\"" + filename + "-" + i + "\"\nNo ofbytes :" + byteWritten);
 		} catch (Exception e) {
 			e.printStackTrace();
 			LOGGER.error(e);
@@ -70,20 +66,18 @@ public class DownloadMailThread implements Runnable {
 
 	public void run() {
 		// TODO Auto-generated method stub
-		while(true){
+		while (true) {
 			String url;
 			try {
 				url = downloadURLQueue.take();
-				downloadMail(url,year,"MailDownload-"+year);
+				downloadMail(url, year, "MailDownload-" + year);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			
-		}
-		
-	}
 
+		}
+
+	}
 
 }

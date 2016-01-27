@@ -14,9 +14,10 @@ public class Crawler {
 
 	private Set<String> pagesVisited = new HashSet<String>();
 	private Set<String> pagesToVisit = new HashSet<String>();
-	public Document returnHtmlDoc(String url){
 
-		Document doc=null;
+	public Document returnHtmlDoc(String url) {
+
+		Document doc = null;
 		try {
 			doc = Jsoup.connect(url).get();
 		} catch (IOException e) {
@@ -37,18 +38,14 @@ public class Crawler {
 				currentUrl = this.nextUrl();
 			}
 
-			boolean success = crawlConn.searhMail(returnHtmlDoc(currentUrl),keyword);
+			boolean success = crawlConn.searhMail(returnHtmlDoc(currentUrl), keyword);
 			if (success) {
 				DownloadMail mail = new DownloadMail();
-				mail.downloadMail(currentUrl,keyword,"Mail-"+keyword);
+				mail.downloadMail(currentUrl, keyword, "Mail-" + keyword);
 
-
+			} else {
+				this.pagesToVisit.addAll(crawlConn.crawl(returnHtmlDoc(currentUrl), keyword));
 			}
-			else{
-				this.pagesToVisit.addAll(crawlConn.crawl(returnHtmlDoc(currentUrl),keyword));
-			}
-
-
 
 		} while (!this.pagesToVisit.isEmpty());
 		LOGGER.debug("All the mails have been downloaded");
@@ -59,13 +56,12 @@ public class Crawler {
 		String nextUrl = null;
 
 		Iterator<String> it = this.pagesToVisit.iterator();
-		do 
-		{
-			nextUrl=it.next().toString();
+		do {
+			nextUrl = it.next().toString();
 			it.remove();
-		}while(this.pagesVisited.contains(nextUrl) );
+		} while (this.pagesVisited.contains(nextUrl));
 
 		this.pagesVisited.add(nextUrl);
 		return nextUrl;
 	}
-	}
+}
